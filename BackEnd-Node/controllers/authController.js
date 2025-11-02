@@ -38,7 +38,7 @@ export async function register(req, res) {
     let username_get = sanitizeInput(username);
     if (charLength(username_get, 6, 35) === 0) {
       resData.message =
-        "Name invalid: Number of characters should be from 6 to 35";
+        "Username invalid: Number of characters should be from 6 to 35";
       return res.json(resData);
     }
 
@@ -49,14 +49,6 @@ export async function register(req, res) {
     }
 
     let password_get = sanitizeInput(password);
-
-    console.log(
-      "from authController.js=> Snatized Input: ",
-      username_get,
-      email_get,
-      name_get,
-      password_get
-    );
 
     const hash = await _hash(password, 10);
     const regUser = await User.create({
