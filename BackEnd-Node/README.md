@@ -36,11 +36,9 @@ backend/
 |-----------|--------|---------------------------|----------------------------|
 | 👤 Auth   | POST   | /api/auth/register        | Register a new user        |
 | 👤 Auth   | POST   | /api/auth/login           | Login user                 |
-| 👤 User   | GET    | /api/users/:username      | Get user by username       |
-| 👤 User   | PUT    | /api/users/:username      | Update user                |
-| 👤 User   | GET    | /api/users/me             | Get current user           |
-| 👤 User   | GET    | /api/users/search         | Search user                |
-| 👤 User   | GET    | /api/users/all-user       | Get all users              |
+| 🧑‍💼 User   | GET    | /api/users/:username      | Get user by username       |
+| 🧑‍💼 User   | PUT    | /api/users/:username      | Update user                |
+| 🧑‍💼 User   | GET    | /api/users/search         | Search user                |
 
 🧩 Key Features
 🔐 Secure JWT-based authentication

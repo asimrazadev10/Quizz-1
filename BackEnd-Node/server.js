@@ -26,11 +26,7 @@ app.get("/api/health", (_req, res) =>
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 
-app.all("*", (req, res) => {
-  res.status(404).json({ message: "Page not Found" });
-});
-
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT;
 
 connectToMongo().then(() => {
   app.listen(PORT, () => console.log(`API active on http://localhost:${PORT}`));
