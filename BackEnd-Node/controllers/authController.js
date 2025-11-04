@@ -80,6 +80,9 @@ export async function register(req, res) {
     return res.json(resData);
   } catch (e) {
     console.error("Error inserting user:", e);
+    resData.status = 500;
+    resData.message = e.code === 11000 ? "Email already exists" : "Registration failed. Please try again.";
+    return res.json(resData);
   }
 }
 
@@ -88,16 +91,16 @@ export async function login(req, res) {
   const u = await User.findOne({ email });
   console.log("User logged in:", u);
 
+  if (!u) return res.status(400).json({ message: "Invalid credentials" });
+
+  const ok = await compare(password, u.passwordHash);
+  if (!ok) return res.status(400).json({ message: "Invalid credentials" });
+
   const payload_data = {
     userId: u._id,
     email: u.email,
     username: u.username,
   };
-
-  if (!u) return res.status(400).json({ message: "Invalid credentials" });
-
-  const ok = await compare(password, u.passwordHash);
-  if (!ok) return res.status(400).json({ message: "Invalid credentials" });
 
   const token = jwt.sign(payload_data, process.env.JWT_SECRET, {
     expiresIn: "2d",

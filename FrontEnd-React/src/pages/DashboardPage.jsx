@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   Inbox, 
@@ -30,13 +31,21 @@ import {
   ChevronRight,
   Activity,
   Package,
-  Zap
+  Zap,
+  LogOut
 } from 'lucide-react';
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 const SubFlow = () => {
+  const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [activeTab, setActiveTab] = useState('dashboard');
+
+  // Logout function
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    navigate('/login');
+  };
 
   // Sample data
   const spendingData = [
@@ -147,7 +156,7 @@ const SubFlow = () => {
 
           {/* User Profile */}
           {sidebarOpen && (
-            <div className="p-4 border-t border-white/10">
+            <div className="p-4 border-t border-white/10 space-y-2">
               <div className="flex items-center space-x-3 p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors cursor-pointer">
                 <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-pink-600 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
                   AT
@@ -158,6 +167,26 @@ const SubFlow = () => {
                 </div>
                 <Settings className="w-4 h-4 text-gray-400 flex-shrink-0" />
               </div>
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl bg-red-900/20 hover:bg-red-900/30 border border-red-500/20 hover:border-red-500/40 transition-all cursor-pointer group"
+              >
+                <LogOut className="w-5 h-5 text-red-400 group-hover:text-red-300" />
+                <span className="font-medium text-sm text-red-400 group-hover:text-red-300">Logout</span>
+              </button>
+            </div>
+          )}
+          
+          {/* Logout button when sidebar is collapsed */}
+          {!sidebarOpen && (
+            <div className="p-4 border-t border-white/10">
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center justify-center p-3 rounded-xl bg-red-900/20 hover:bg-red-900/30 border border-red-500/20 hover:border-red-500/40 transition-all cursor-pointer group"
+                title="Logout"
+              >
+                <LogOut className="w-5 h-5 text-red-400 group-hover:text-red-300" />
+              </button>
             </div>
           )}
         </div>
@@ -166,7 +195,7 @@ const SubFlow = () => {
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto">
         {/* Header */}
-        <header className="bg-black/50 border-b border-white/10 sticky top-16 z-10 backdrop-blur-xl">
+        <header className="bg-black/50 border-b border-white/10 sticky top-5 z-10 backdrop-blur-xl">
           <div className="flex items-center justify-between px-4 py-3">
             <div className="flex items-center space-x-4">
               <div>

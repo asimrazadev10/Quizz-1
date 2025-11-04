@@ -1,8 +1,12 @@
 "use client"
 
 import { useState } from "react"
+import { useNavigate } from "react-router-dom"
+import { authAPI } from "../utils/api"
 
 export default function LoginPage() {
+  const navigate = useNavigate()
+  
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -11,18 +15,58 @@ export default function LoginPage() {
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
+  const [error, setError] = useState("")
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    setIsSubmitting(true)
+  const validateForm = () => {
+    setError("")
     
-    // Simulate login
-    setTimeout(() => {
-      console.log("Login submitted:", formData)
-      alert("Welcome back to SubFlow! Redirecting to your dashboard...")
+    // Email validation
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailPattern.test(formData.email.trim())) {
+      setError("Please enter a valid email address")
+      return false
+    }
+
+    // Password validation
+    if (!formData.password) {
+      setError("Password is required")
+      return false
+    }
+
+    return true
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    
+    if (!validateForm()) {
+      return
+    }
+
+    setIsSubmitting(true)
+    setError("")
+    
+    try {
+      const response = await authAPI.login(formData.email.trim(), formData.password)
+      
+      if (response.token) {
+        // Store token in localStorage
+        localStorage.setItem('token', response.token)
+        
+        // Redirect to dashboard
+        navigate('/dashboard')
+      } else {
+        setError("Login failed. Please check your credentials.")
+      }
+    } catch (err) {
+      if (err.response?.data?.message) {
+        setError(err.response.data.message)
+      } else {
+        setError("Invalid credentials. Please try again.")
+      }
+    } finally {
       setIsSubmitting(false)
-      // Redirect to dashboard
-    }, 1500)
+    }
   }
 
   const handleChange = (e) => {
@@ -130,6 +174,13 @@ export default function LoginPage() {
 
             {/* Login Form */}
             <form onSubmit={handleSubmit} className="card-glass p-8 space-y-6">
+              {/* Error Message */}
+              {error && (
+                <div className="p-4 bg-red-900/20 border border-red-500/50 rounded-lg text-red-400 text-sm">
+                  {error}
+                </div>
+              )}
+
               {/* Email */}
               <div>
                 <label htmlFor="email" className="block text-white font-medium mb-2 text-sm">

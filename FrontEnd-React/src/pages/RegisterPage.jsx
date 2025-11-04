@@ -1,15 +1,19 @@
 "use client"
 
 import { useState } from "react"
+import { useNavigate } from "react-router-dom"
+import { authAPI } from "../utils/api"
 
 export default function RegisterPage() {
+  const navigate = useNavigate()
+  
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
+    name: "",
+    username: "",
     email: "",
     password: "",
     confirmPassword: "",
-    company: "",
+    companyName: "",
     agreeToTerms: false,
     subscribeToUpdates: true
   })
@@ -17,29 +21,109 @@ export default function RegisterPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [error, setError] = useState("")
+  const [success, setSuccess] = useState("")
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
+  // Client-side validation
+  const validateForm = () => {
+    setError("")
     
+    // Name validation - alphabetic only, 6-35 characters
+    const namePattern = /^[A-Za-z]+(?:\s[A-Za-z]+)?$/
+    if (!namePattern.test(formData.name.trim())) {
+      setError("Name must contain only alphabetic characters")
+      return false
+    }
+    if (formData.name.trim().length < 6 || formData.name.trim().length > 35) {
+      setError("Name must be between 6 and 35 characters")
+      return false
+    }
+
+    // Username validation - 6-35 characters
+    if (formData.username.trim().length < 6 || formData.username.trim().length > 35) {
+      setError("Username must be between 6 and 35 characters")
+      return false
+    }
+
+    // Email validation
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailPattern.test(formData.email.trim())) {
+      setError("Please enter a valid email address")
+      return false
+    }
+
+    // Password validation
+    if (formData.password.length < 1) {
+      setError("Password is required")
+      return false
+    }
+
+    // Confirm password match
     if (formData.password !== formData.confirmPassword) {
-      alert("Passwords don't match!")
-      return
+      setError("Passwords don't match!")
+      return false
     }
 
     if (!formData.agreeToTerms) {
-      alert("Please agree to the Terms of Service and Privacy Policy")
+      setError("Please agree to the Terms of Service and Privacy Policy")
+      return false
+    }
+
+    return true
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    
+    if (!validateForm()) {
       return
     }
 
     setIsSubmitting(true)
+    setError("")
+    setSuccess("")
     
-    // Simulate registration
-    setTimeout(() => {
-      console.log("Registration submitted:", formData)
-      alert("Welcome to SubFlow! Check your email to verify your account.")
+    try {
+      const registrationData = {
+        name: formData.name.trim(),
+        username: formData.username.trim(),
+        email: formData.email.trim(),
+        password: formData.password,
+        companyName: formData.companyName.trim() || undefined
+      }
+
+      const response = await authAPI.register(registrationData)
+      
+      if (response.status === 201 || response.token) {
+        setSuccess(response.message || "Registration successful!")
+        
+        // Store token if provided
+        if (response.token) {
+          localStorage.setItem('token', response.token)
+        }
+        
+        // Redirect to login or dashboard
+        setTimeout(() => {
+          navigate('/login')
+        }, 2000)
+      } else {
+        setError(response.message || "Registration failed. Please try again.")
+      }
+    } catch (err) {
+      // Handle validation errors from backend
+      if (err.response?.data?.message) {
+        setError(err.response.data.message)
+      } else if (err.response?.data?.errors) {
+        const validationErrors = err.response.data.errors
+          .map(e => e.msg)
+          .join(", ")
+        setError(validationErrors)
+      } else {
+        setError("An error occurred during registration. Please try again.")
+      }
+    } finally {
       setIsSubmitting(false)
-      // Redirect to dashboard or login
-    }, 2000)
+    }
   }
 
   const handleChange = (e) => {
@@ -84,39 +168,50 @@ export default function RegisterPage() {
 
             {/* Registration Form */}
             <form onSubmit={handleSubmit} className="card-glass p-8 space-y-6">
-              {/* Name Fields */}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label htmlFor="firstName" className="block text-white font-medium mb-2 text-sm">
-                    First Name *
-                  </label>
-                  <input
-                    type="text"
-                    id="firstName"
-                    name="firstName"
-                    value={formData.firstName}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-200"
-                    placeholder="John"
-                  />
+              {/* Error Message */}
+              {error && (
+                <div className="p-4 bg-red-900/20 border border-red-500/50 rounded-lg text-red-400 text-sm">
+                  {error}
                 </div>
+              )}
 
-                <div>
-                  <label htmlFor="lastName" className="block text-white font-medium mb-2 text-sm">
-                    Last Name *
-                  </label>
-                  <input
-                    type="text"
-                    id="lastName"
-                    name="lastName"
-                    value={formData.lastName}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-200"
-                    placeholder="Doe"
-                  />
+              {/* Success Message */}
+              {success && (
+                <div className="p-4 bg-green-900/20 border border-green-500/50 rounded-lg text-green-400 text-sm">
+                  {success}
                 </div>
+              )}
+
+              {/* Name Field */}
+              <div>
+                <label htmlFor="name" className="block text-white font-medium mb-2 text-sm">
+                  Full Name *
+                </label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-200"
+                  placeholder="John Doe (6-35 characters, letters only)"
+                />
+              </div>
+
+              {/* Username Field */}
+              <div>
+                <label htmlFor="username" className="block text-white font-medium mb-2 text-sm">
+                  Username *
+                </label>
+                <input
+                  type="text"
+                  id="username"
+                  name="username"
+                  value={formData.username}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-200"
+                  placeholder="username (6-35 characters)"
+                />
               </div>
 
               {/* Email */}
@@ -138,14 +233,14 @@ export default function RegisterPage() {
 
               {/* Company */}
               <div>
-                <label htmlFor="company" className="block text-white font-medium mb-2 text-sm">
+                <label htmlFor="companyName" className="block text-white font-medium mb-2 text-sm">
                   Company/Startup Name
                 </label>
                 <input
                   type="text"
-                  id="company"
-                  name="company"
-                  value={formData.company}
+                  id="companyName"
+                  name="companyName"
+                  value={formData.companyName}
                   onChange={handleChange}
                   className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-200"
                   placeholder="Your Company (optional)"
