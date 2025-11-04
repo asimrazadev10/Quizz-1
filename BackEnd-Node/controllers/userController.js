@@ -6,6 +6,11 @@ import sanitizeInput from "../utils/sanitizeInput.js";
 
 import { validationResult } from "express-validator";
 
+const getMe = async (req, res) => {
+  const u = await User.findById(req.userId).select("-passwordHash");
+  res.json(u);
+};
+
 const getUserByUsername = async (req, res) => {
   const u = await User.findOne({ username: req.params.username }).select(
     "-passwordHash"
@@ -104,6 +109,7 @@ const searchUsers = async (req, res) => {
 };
 
 export default {
+  getMe,
   getUserByUsername,
   updateUser,
   searchUsers,

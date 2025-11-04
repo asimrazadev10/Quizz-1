@@ -1,5 +1,3 @@
-"use client"
-
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { authAPI } from "../utils/api"
@@ -100,11 +98,17 @@ export default function RegisterPage() {
         // Store token if provided
         if (response.token) {
           localStorage.setItem('token', response.token)
+          // Notify other components in the same tab to update auth state
+          try {
+            window.dispatchEvent(new Event('authChanged'))
+          } catch (e) {
+            // ignore
+          }
         }
         
-        // Redirect to login or dashboard
+        // Redirect to dashboard
         setTimeout(() => {
-          navigate('/login')
+          navigate('/dashboard')
         }, 2000)
       } else {
         setError(response.message || "Registration failed. Please try again.")

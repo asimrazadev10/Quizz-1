@@ -120,7 +120,9 @@ export default function Hero() {
                   </svg>
                 </div>
                 <div>
-                  <div className="text-white font-semibold">Savings Unlocked</div>
+                  <div className="text-white font-semibold">
+                    Savings Unlocked
+                  </div>
                   <div className="text-gray-400 text-sm">
                     Average User Saves $20/Mo
                   </div>

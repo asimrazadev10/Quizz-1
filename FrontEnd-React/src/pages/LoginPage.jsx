@@ -1,87 +1,95 @@
-"use client"
-
-import { useState } from "react"
-import { useNavigate } from "react-router-dom"
-import { authAPI } from "../utils/api"
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { authAPI } from "../utils/api";
 
 export default function LoginPage() {
-  const navigate = useNavigate()
-  
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
-    rememberMe: false
-  })
+    rememberMe: false,
+  });
 
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [showPassword, setShowPassword] = useState(false)
-  const [error, setError] = useState("")
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
 
   const validateForm = () => {
-    setError("")
-    
+    setError("");
+
     // Email validation
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailPattern.test(formData.email.trim())) {
-      setError("Please enter a valid email address")
-      return false
+      setError("Please enter a valid email address");
+      return false;
     }
 
     // Password validation
     if (!formData.password) {
-      setError("Password is required")
-      return false
+      setError("Password is required");
+      return false;
     }
 
-    return true
-  }
+    return true;
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    
+    e.preventDefault();
+
     if (!validateForm()) {
-      return
+      return;
     }
 
-    setIsSubmitting(true)
-    setError("")
-    
+    setIsSubmitting(true);
+    setError("");
+
     try {
-      const response = await authAPI.login(formData.email.trim(), formData.password)
-      
+      const response = await authAPI.login(
+        formData.email.trim(),
+        formData.password
+      );
+
       if (response.token) {
         // Store token in localStorage
-        localStorage.setItem('token', response.token)
-        
+        localStorage.setItem("token", response.token);
+
+        // Notify other components in the same tab to update auth state
+        try {
+          window.dispatchEvent(new Event("authChanged"));
+        } catch (e) {
+          // ignore
+        }
+
         // Redirect to dashboard
-        navigate('/dashboard')
+        navigate("/dashboard");
       } else {
-        setError("Login failed. Please check your credentials.")
+        setError("Login failed. Please check your credentials.");
       }
     } catch (err) {
       if (err.response?.data?.message) {
-        setError(err.response.data.message)
+        setError(err.response.data.message);
       } else {
-        setError("Invalid credentials. Please try again.")
+        setError("Invalid credentials. Please try again.");
       }
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target
+    const { name, value, type, checked } = e.target;
     setFormData({
       ...formData,
-      [name]: type === 'checkbox' ? checked : value,
-    })
-  }
+      [name]: type === "checkbox" ? checked : value,
+    });
+  };
 
   const stats = [
     { number: "100+", label: "Happy Users" },
     { number: "PKR 2M+", label: "Money Saved" },
-    { number: "1000+", label: "Subscriptions Managed" }
-  ]
+    { number: "1000+", label: "Subscriptions Managed" },
+  ];
 
   return (
     <div className="min-h-screen bg-black">
@@ -98,20 +106,26 @@ export default function LoginPage() {
             {/* Logo/Brand */}
             <div className="mb-12">
               <h1 className="text-5xl font-bold text-white mb-4 leading-tight">
-                Welcome Back to <span className="heading-gradient">SubFlow</span>
+                Welcome Back to{" "}
+                <span className="heading-gradient">SubFlow</span>
               </h1>
               <p className="text-xl text-gray-400 leading-relaxed">
-                Your Pakistani subscription management platform. Take control of your recurring expenses with tools built for startups.
+                Your Pakistani subscription management platform. Take control of
+                your recurring expenses with tools built for startups.
               </p>
             </div>
 
             {/* Stats */}
             <div className="mb-12">
-              <h3 className="text-2xl font-bold text-white mb-6">Join Our Growing Community</h3>
+              <h3 className="text-2xl font-bold text-white mb-6">
+                Join Our Growing Community
+              </h3>
               <div className="grid grid-cols-3 gap-6">
                 {stats.map((stat, index) => (
                   <div key={index} className="text-center">
-                    <div className="text-3xl font-bold text-white mb-2">{stat.number}</div>
+                    <div className="text-3xl font-bold text-white mb-2">
+                      {stat.number}
+                    </div>
                     <div className="text-sm text-gray-400">{stat.label}</div>
                   </div>
                 ))}
@@ -122,14 +136,27 @@ export default function LoginPage() {
             <div className="card-glass p-6">
               <div className="flex items-start gap-4">
                 <div className="w-12 h-12 bg-purple-600/20 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <svg className="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  <svg
+                    className="w-6 h-6 text-purple-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M13 10V3L4 14h7v7l9-11h-7z"
+                    />
                   </svg>
                 </div>
                 <div>
-                  <h4 className="text-white font-semibold text-lg mb-2">Pakistani Innovation</h4>
+                  <h4 className="text-white font-semibold text-lg mb-2">
+                    Pakistani Innovation
+                  </h4>
                   <p className="text-gray-400 leading-relaxed">
-                    Built by Pakistani entrepreneurs who understand the unique challenges of managing subscriptions in emerging markets.
+                    Built by Pakistani entrepreneurs who understand the unique
+                    challenges of managing subscriptions in emerging markets.
                   </p>
                 </div>
               </div>
@@ -145,7 +172,9 @@ export default function LoginPage() {
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
               <div className="absolute bottom-4 left-4">
                 <div className="text-white font-semibold">Remote First</div>
-                <div className="text-gray-200 text-sm">Working across Pakistan</div>
+                <div className="text-gray-200 text-sm">
+                  Working across Pakistan
+                </div>
               </div>
             </div>
           </div>
@@ -157,7 +186,8 @@ export default function LoginPage() {
             {/* Mobile Header */}
             <div className="text-center mb-8 lg:hidden">
               <h1 className="text-4xl font-bold text-white mb-4 leading-tight">
-                Welcome Back to <span className="heading-gradient">SubFlow</span>
+                Welcome Back to{" "}
+                <span className="heading-gradient">SubFlow</span>
               </h1>
             </div>
 
@@ -183,7 +213,10 @@ export default function LoginPage() {
 
               {/* Email */}
               <div>
-                <label htmlFor="email" className="block text-white font-medium mb-2 text-sm">
+                <label
+                  htmlFor="email"
+                  className="block text-white font-medium mb-2 text-sm"
+                >
                   Email Address
                 </label>
                 <input
@@ -200,7 +233,10 @@ export default function LoginPage() {
 
               {/* Password */}
               <div>
-                <label htmlFor="password" className="block text-white font-medium mb-2 text-sm">
+                <label
+                  htmlFor="password"
+                  className="block text-white font-medium mb-2 text-sm"
+                >
                   Password
                 </label>
                 <div className="relative">
@@ -219,11 +255,26 @@ export default function LoginPage() {
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
                   >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
                       {showPassword ? (
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L8.464 8.464m1.414 1.414l-7.071 7.071M15.121 14.121L16.535 15.535m-1.414-1.414l7.071-7.071" />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L8.464 8.464m1.414 1.414l-7.071 7.071M15.121 14.121L16.535 15.535m-1.414-1.414l7.071-7.071"
+                        />
                       ) : (
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                        />
                       )}
                     </svg>
                   </button>
@@ -245,7 +296,10 @@ export default function LoginPage() {
                     Remember me
                   </label>
                 </div>
-                <a href="#" className="text-sm text-purple-400 hover:text-purple-300 transition-colors">
+                <a
+                  href="#"
+                  className="text-sm text-purple-400 hover:text-purple-300 transition-colors"
+                >
                   Forgot password?
                 </a>
               </div>
@@ -258,8 +312,18 @@ export default function LoginPage() {
               >
                 {isSubmitting ? (
                   <>
-                    <svg className="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    <svg
+                      className="w-5 h-5 animate-spin"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                      />
                     </svg>
                     Signing In...
                   </>
@@ -274,7 +338,9 @@ export default function LoginPage() {
                   <div className="w-full border-t border-white/10"></div>
                 </div>
                 <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-black text-gray-400">Or continue with</span>
+                  <span className="px-2 bg-black text-gray-400">
+                    Or continue with
+                  </span>
                 </div>
               </div>
 
@@ -284,7 +350,11 @@ export default function LoginPage() {
                   type="button"
                   className="flex items-center justify-center gap-2 px-4 py-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-lg text-white transition-all duration-200"
                 >
-                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                  <svg
+                    className="w-5 h-5"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
                     <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
                     <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
                     <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
@@ -297,7 +367,11 @@ export default function LoginPage() {
                   type="button"
                   className="flex items-center justify-center gap-2 px-4 py-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-lg text-white transition-all duration-200"
                 >
-                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                  <svg
+                    className="w-5 h-5"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
                     <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
                   </svg>
                   <span>Facebook</span>
@@ -307,7 +381,10 @@ export default function LoginPage() {
               {/* Register Link */}
               <div className="text-center text-sm">
                 <span className="text-gray-400">Don't have an account? </span>
-                <a href="/register" className="text-purple-400 hover:text-purple-300 font-semibold transition-colors">
+                <a
+                  href="/register"
+                  className="text-purple-400 hover:text-purple-300 font-semibold transition-colors"
+                >
                   Start your free trial
                 </a>
               </div>
@@ -317,15 +394,40 @@ export default function LoginPage() {
             <div className="mt-8 text-center">
               <div className="flex items-center justify-center gap-4 text-sm text-gray-400">
                 <div className="flex items-center gap-2">
-                  <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                  <svg
+                    className="w-4 h-4 text-green-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                    />
                   </svg>
                   <span>Secure Login</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <svg className="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <svg
+                    className="w-4 h-4 text-blue-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
                   </svg>
                   <span>Made in Pakistan</span>
                 </div>
@@ -335,5 +437,5 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

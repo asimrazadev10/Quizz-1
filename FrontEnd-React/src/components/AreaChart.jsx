@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react"
+import { useMemo, useRef, useState } from "react";
 
 export default function AreaChart({
   data = [],
@@ -8,33 +8,42 @@ export default function AreaChart({
   fill = "#a78bfa",
   grid = true,
 }) {
-  const [hoverIndex, setHoverIndex] = useState(null)
-  const svgRef = useRef(null)
+  const [hoverIndex, setHoverIndex] = useState(null);
+  const svgRef = useRef(null);
 
   const { pathD, areaD, xPositions, yPositions, min, max } = useMemo(() => {
-    if (!data || data.length === 0) return {}
-    const minV = Math.min(...data)
-    const maxV = Math.max(...data)
-    const range = maxV - minV || 1
-    const stepX = width / (data.length - 1)
+    if (!data || data.length === 0) return {};
+    const minV = Math.min(...data);
+    const maxV = Math.max(...data);
+    const range = maxV - minV || 1;
+    const stepX = width / (data.length - 1);
 
-    const xs = data.map((_, i) => i * stepX)
-    const ys = data.map((v) => height - ((v - minV) / range) * height)
-    const d = data.map((v, i) => `${i === 0 ? "M" : "L"}${xs[i]},${ys[i]}`).join(" ")
-    const area = `M0,${height} ${d.replace(/^M/, "L")} L${width},${height} Z`
-    return { pathD: d, areaD: area, xPositions: xs, yPositions: ys, min: minV, max: maxV }
-  }, [data, height, width])
+    const xs = data.map((_, i) => i * stepX);
+    const ys = data.map((v) => height - ((v - minV) / range) * height);
+    const d = data
+      .map((v, i) => `${i === 0 ? "M" : "L"}${xs[i]},${ys[i]}`)
+      .join(" ");
+    const area = `M0,${height} ${d.replace(/^M/, "L")} L${width},${height} Z`;
+    return {
+      pathD: d,
+      areaD: area,
+      xPositions: xs,
+      yPositions: ys,
+      min: minV,
+      max: maxV,
+    };
+  }, [data, height, width]);
 
-  if (!data || data.length === 0) return null
+  if (!data || data.length === 0) return null;
 
-  const hoverX = hoverIndex != null ? xPositions[hoverIndex] : null
-  const hoverY = hoverIndex != null ? yPositions[hoverIndex] : null
+  const hoverX = hoverIndex != null ? xPositions[hoverIndex] : null;
+  const hoverY = hoverIndex != null ? yPositions[hoverIndex] : null;
 
   function handleMouseMove(e) {
-    const rect = svgRef.current.getBoundingClientRect()
-    const x = e.clientX - rect.left
-    const idx = Math.round((x / width) * (data.length - 1))
-    setHoverIndex(Math.max(0, Math.min(data.length - 1, idx)))
+    const rect = svgRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const idx = Math.round((x / width) * (data.length - 1));
+    setHoverIndex(Math.max(0, Math.min(data.length - 1, idx)));
   }
 
   return (
@@ -59,17 +68,36 @@ export default function AreaChart({
         {grid && (
           <g stroke="#2a2a2a" strokeWidth="1">
             {Array.from({ length: 4 }).map((_, i) => (
-              <line key={i} x1="0" x2={width} y1={(height / 4) * i} y2={(height / 4) * i} />
+              <line
+                key={i}
+                x1="0"
+                x2={width}
+                y1={(height / 4) * i}
+                y2={(height / 4) * i}
+              />
             ))}
           </g>
         )}
 
         <path d={areaD} fill="url(#areaGradient)" />
-        <path d={pathD} fill="none" stroke={stroke} strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
+        <path
+          d={pathD}
+          fill="none"
+          stroke={stroke}
+          strokeWidth="2"
+          strokeLinejoin="round"
+          strokeLinecap="round"
+        />
 
         {hoverIndex != null && (
           <g>
-            <line x1={hoverX} x2={hoverX} y1={0} y2={height} stroke="#ffffff22" />
+            <line
+              x1={hoverX}
+              x2={hoverX}
+              y1={0}
+              y2={height}
+              stroke="#ffffff22"
+            />
             <circle cx={hoverX} cy={hoverY} r="4" fill="#fff" />
           </g>
         )}
@@ -88,7 +116,5 @@ export default function AreaChart({
         <span>Max: {max}</span>
       </div>
     </div>
-  )
+  );
 }
-
-

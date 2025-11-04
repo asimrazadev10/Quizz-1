@@ -1,6 +1,4 @@
-"use client"
-
-import { useState } from "react"
+import { useState } from "react";
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -8,25 +6,28 @@ export default function Contact() {
     email: "",
     subject: "",
     message: "",
-  })
+  });
 
   const handleSubmit = (e) => {
-    e.preventDefault()
+    e.preventDefault();
     // Handle form submission here
-    console.log("Form submitted:", formData)
-    alert("Thank you for your message! We will get back to you soon.")
-    setFormData({ name: "", email: "", subject: "", message: "" })
-  }
+    console.log("Form submitted:", formData);
+    alert("Thank you for your message! We will get back to you soon.");
+    setFormData({ name: "", email: "", subject: "", message: "" });
+  };
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
-    })
-  }
+    });
+  };
 
   return (
-    <section id="contact" className="py-24 bg-gradient-to-b from-gray-900 to-black">
+    <section
+      id="contact"
+      className="py-24 bg-gradient-to-b from-gray-900 to-black"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-16">
           {/* Left - Contact Info */}
@@ -38,14 +39,20 @@ export default function Contact() {
             </h2>
 
             <p className="text-lg text-gray-400 mb-8 leading-relaxed">
-              Have questions? Want to see a demo? Our team is here to help you take control of your subscriptions.
+              Have questions? Want to see a demo? Our team is here to help you
+              take control of your subscriptions.
             </p>
 
             {/* Contact Details */}
             <div className="space-y-6">
               <div className="flex items-start gap-4">
                 <div className="w-12 h-12 bg-purple-600/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <svg className="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg
+                    className="w-6 h-6 text-purple-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -62,7 +69,12 @@ export default function Contact() {
 
               <div className="flex items-start gap-4">
                 <div className="w-12 h-12 bg-purple-600/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <svg className="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg
+                    className="w-6 h-6 text-purple-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -79,7 +91,12 @@ export default function Contact() {
 
               <div className="flex items-start gap-4">
                 <div className="w-12 h-12 bg-purple-600/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <svg className="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg
+                    className="w-6 h-6 text-purple-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -96,7 +113,9 @@ export default function Contact() {
                 </div>
                 <div>
                   <h3 className="text-white font-semibold mb-1">Office</h3>
-                  <p className="text-gray-400">123 Tech Street, San Francisco, CA 94105</p>
+                  <p className="text-gray-400">
+                    123 Tech Street, San Francisco, CA 94105
+                  </p>
                 </div>
               </div>
             </div>
@@ -116,7 +135,10 @@ export default function Contact() {
           <div className="card-glass p-8">
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
-                <label htmlFor="name" className="block text-white font-medium mb-2">
+                <label
+                  htmlFor="name"
+                  className="block text-white font-medium mb-2"
+                >
                   Full Name
                 </label>
                 <input
@@ -132,7 +154,10 @@ export default function Contact() {
               </div>
 
               <div>
-                <label htmlFor="email" className="block text-white font-medium mb-2">
+                <label
+                  htmlFor="email"
+                  className="block text-white font-medium mb-2"
+                >
                   Email Address
                 </label>
                 <input
@@ -148,7 +173,10 @@ export default function Contact() {
               </div>
 
               <div>
-                <label htmlFor="subject" className="block text-white font-medium mb-2">
+                <label
+                  htmlFor="subject"
+                  className="block text-white font-medium mb-2"
+                >
                   Subject
                 </label>
                 <input
@@ -164,7 +192,10 @@ export default function Contact() {
               </div>
 
               <div>
-                <label htmlFor="message" className="block text-white font-medium mb-2">
+                <label
+                  htmlFor="message"
+                  className="block text-white font-medium mb-2"
+                >
                   Message
                 </label>
                 <textarea
@@ -179,10 +210,7 @@ export default function Contact() {
                 ></textarea>
               </div>
 
-              <button
-                type="submit"
-                className="w-full btn-gradient text-lg"
-              >
+              <button type="submit" className="w-full btn-gradient text-lg">
                 Send Message
               </button>
             </form>
@@ -190,5 +218,5 @@ export default function Contact() {
         </div>
       </div>
     </section>
-  )
+  );
 }
